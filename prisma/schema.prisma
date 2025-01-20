@@ -1,0 +1,110 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id Int @id @default(autoincrement())
+  first_name String
+  last_name String
+  email String @unique 
+  password String
+  provider_id Int
+  access_token String
+  refresh_token String
+  token_expiry String
+  created_at DateTime 
+  updated_at DateTime @updatedAt
+
+  logs Log[]
+  oauth_provider OauthProvider[] @relation("UserProvider")
+  playlist Playlist[] @relation("UserPlaylist")
+}
+
+model OauthProvider {
+  id Int @id @default(autoincrement())
+  name String @unique 
+  client_id String
+  client_secret String
+  redirect_uri String
+  auth_url String
+  token_url String
+  created_at DateTime
+  updated_at DateTime @updatedAt
+
+  User User[] @relation("UserProvider")
+}
+
+enum Role {
+  OWNER
+  COLLABORATOR
+}
+
+model Playlist {
+  id Int @id @default(autoincrement())
+  name String
+  description String?
+  role Role @default(OWNER)
+  external_id String @unique
+  users User[] @relation("UserPlaylist")
+  songs Song[] @relation("PlaylistSong")
+}
+
+model Song {
+  id Int @id @default(autoincrement())
+  external_id String @unique
+  title String
+  astist_id Int 
+  duration Int 
+  thumbnail_url String
+  album_id Int
+  genre_id Int
+  artist Artist @relation(fields: [astist_id], references: [id])
+  album Album @relation(fields: [album_id], references: [id])
+  genre Genre @relation(fields: [genre_id], references: [id])
+  playlist Playlist[] @relation("PlaylistSong")
+}
+
+model Album {
+  id Int @id @default(autoincrement())
+  album_name String
+  artist_id Int 
+  release_date DateTime
+  songs Song[]
+  artist Artist @relation(fields: [artist_id], references: [id])
+}
+
+model Artist {
+  id Int @id @default(autoincrement())
+  name String
+  biography String?
+  songs Song[]
+  albums Album[]
+}
+
+model Genre {
+  id Int @id @default(autoincrement())
+  name String @unique
+  songs Song[]
+}
+
+
+model Log {
+  id Int @id @default(autoincrement())
+  user_id Int
+  endpoint String
+  request_body String?
+  response_status Int
+  timestamp DateTime
+  user User @relation(fields: [user_id], references: [id])
+}
