@@ -9,15 +9,20 @@ export class PlaylistsController {
     @Get()
     findAll() {
         try {
-            return this.playlistService.getPlaylists();
+            return this.playlistService.getAllPlaylists();
         } catch (error) {
             return "No playlists available";
         }
     }
 
     @Get(":id")
-    findOne(@Param() id) {
-        return `This is a playlist ${id}`;
+    findOne(@Param('id') id: string) {
+        try {
+            const playlistId: number = parseInt(id);
+            return this.playlistService.getPlaylistById(playlistId);
+        } catch (error) {
+            return "Playlist not found";
+        }
     }
 
     @Post()
