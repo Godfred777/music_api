@@ -7,27 +7,27 @@ export class PlaylistsController {
     constructor(private readonly playlistService: PlaylistsService) {}
 
     @Get()
-    findAll() {
+     async findAllPlaylists() {
         try {
-            return this.playlistService.getAllPlaylists();
+            return await this.playlistService.getAllPlaylists();
         } catch (error) {
             return "No playlists available";
         }
     }
 
     @Get(":id")
-    findOne(@Param('id') id: string) {
+    async findOnePlaylist(@Param('id') id: string) {
         try {
             const playlistId: number = parseInt(id);
-            return this.playlistService.getPlaylistById(playlistId);
+            return await this.playlistService.getPlaylistById(playlistId);
         } catch (error) {
             return "Playlist not found";
         }
     }
 
     @Post()
-    create() {
-        return "New playlist created";
+    async create() {
+        return await "New playlist created";
     }
 }
 
