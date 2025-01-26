@@ -2,8 +2,10 @@ import { Injectable, UnauthorizedException, ConflictException, BadRequestExcepti
 import { UsersService } from 'src/users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import { Prisma, User } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import { RegisterUserDto } from './dto/register-user.dto';
+import { LoginDto } from './dto/login-user.dto';
+import { identity } from 'rxjs';
 
 interface JwtPayload {
   username: string;
@@ -30,13 +32,26 @@ export class AuthService {
         throw new UnauthorizedException('Invalid credentials');
     }
 
-    async login(user: User) {
+    async login(loginDto: LoginDto) {
+        const user = await this.validateUser(loginDto.email, loginDto.password);
+        if (!user) {
+            throw new UnauthorizedException('Invalid credentials');
+        }
+
         const payload: JwtPayload = { 
             username: user.email, 
             sub: user.id 
         };
         return {
             access_token: this.jwtService.sign(payload),
+            user : {
+                id: user.id,
+                first_name: user.first_name,
+                last_name: user.last_name,
+                email: user.email,
+                created_at: user.created_at,
+                updated_at: user.updated_at,
+            }
         };
     }
 

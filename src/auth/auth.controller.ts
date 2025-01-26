@@ -4,6 +4,7 @@ import { User } from '@prisma/client';
 import { LocalAuthGuard } from './local-auth.guard';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { RegisterUserDto } from './dto/register-user.dto';
+import { LoginDto } from './dto/login-user.dto';
 
 
 @Controller('auth')
@@ -13,8 +14,8 @@ export class AuthController {
     //Login a user
     @Post('login')
     @UseGuards(LocalAuthGuard)
-    async login(@Body() user: User) {
-        return this.authService.login(user)
+    async login(@Body() loginDto: LoginDto) {
+        return this.authService.login(loginDto)
     }
 
     //Registers a user
