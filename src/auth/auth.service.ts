@@ -2,7 +2,8 @@ import { Injectable, UnauthorizedException, ConflictException, BadRequestExcepti
 import { UsersService } from 'src/users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import { User } from '@prisma/client';
+import { Prisma, User } from '@prisma/client';
+import { RegisterUserDto } from './dto/register-user.dto';
 
 interface JwtPayload {
   username: string;
@@ -39,26 +40,30 @@ export class AuthService {
         };
     }
 
-    async register(user: User) {
-        if (!user.email || !user.password) {
-            throw new BadRequestException('Email and password are required');
-        }
+    async register(userDto: RegisterUserDto) {
 
-        const existingUser = await this.usersService.getUserByEmail(user.email);
+        const existingUser = await this.usersService.getUserByEmail(userDto.email);
         if (existingUser) {
             throw new ConflictException('User already exists');
         }
 
         try {
-            const hashedPassword = await bcrypt.hash(user.password, 10);
-            const newUser = await this.usersService.createUser({
-                ...user, 
-                password: hashedPassword
-            });
+            const hashedPassword = await bcrypt.hash(userDto.password, 10);
+
+            const userData: Prisma.UserCreateInput = {
+                first_name: userDto.first_name,
+                last_name: userDto.last_name,
+                email: userDto.email,
+                password: hashedPassword,
+                created_at: new Date(),
+                updated_at: new Date(),
+            };
+
+            const newUser = await this.usersService.createUser(userData);
             const {password, ...result} = newUser;
             return result;
         } catch (error) {
-            throw new BadRequestException('Could not create user');
+            throw new BadRequestException(error.message);
         }
     }
 }

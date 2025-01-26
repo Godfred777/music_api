@@ -37,7 +37,7 @@ export class UsersService {
         const user = await this.prisma.user.findUnique({
             where: { email }
         });
-        
+
         return user;
     }
 
@@ -45,10 +45,17 @@ export class UsersService {
      * Creates a new user in the database
      */
     async createUser(data: Prisma.UserCreateInput): Promise<User> {
-        if (!data.email || !data.password) {
-            throw new BadRequestException('Email and password are required');
+        try {
+            const user = await this.prisma.user.create({
+                data: {
+                    ...data,
+                    provider_id: data.provider_id || null,
+                }
+            });
+            return user;
+        } catch (error) {
+            console.error('Database error:', error);
+            throw new BadRequestException(error.message);
         }
-
-        return this.prisma.user.create({ data });
     }
 }

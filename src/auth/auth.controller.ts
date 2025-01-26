@@ -20,19 +20,7 @@ export class AuthController {
     //Registers a user
     @Post('register')
     async register(@Body() userDto: RegisterUserDto) {
-
-        const user: User = {
-            id: 0, // or set a default id
-            first_name: userDto.first_name,
-            last_name: userDto.last_name,
-            email: userDto.email,
-            password: userDto.password,
-            provider_id: 0, // or set a default provider_id
-            created_at: new Date(),
-            updated_at: new Date()
-        };
-
-        return this.authService.register(user)
+        return this.authService.register(userDto)
     }
 
     //Retrieves a user's profile
