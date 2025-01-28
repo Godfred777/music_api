@@ -5,7 +5,6 @@ import * as bcrypt from 'bcrypt';
 import { Prisma } from '@prisma/client';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { LoginDto } from './dto/login-user.dto';
-import { identity } from 'rxjs';
 
 interface JwtPayload {
   username: string;
