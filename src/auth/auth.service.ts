@@ -118,6 +118,7 @@ export class AuthService {
 
     async loginSpotifyUser(accessToken: string) {
         const spotifyUserProfile = await this.getSpotifyUserProfile(accessToken);
+        const provider = await this.oauthService.create_or_update_oauth_provider();
 
         let user = await this.usersService.getUserByEmail(spotifyUserProfile.email);
         if (!user) {
@@ -126,6 +127,7 @@ export class AuthService {
                 last_name: spotifyUserProfile.display_name.split(' ').slice(1).join(' '),
                 email: spotifyUserProfile.email,
                 password: '', // No password as it's an OAuth user
+                provider_id:provider.id,
                 created_at: new Date(),
                 updated_at: new Date(),
             };
@@ -159,11 +161,14 @@ export class AuthService {
             throw new ConflictException('User already exists');
         }
 
+        const provider = await this.oauthService.create_or_update_oauth_provider();
+
         const userData: Prisma.UserCreateInput = {
             first_name: spotifyUserProfile.display_name.split(' ')[0],
             last_name: spotifyUserProfile.display_name.split(' ').slice(1).join(' '),
             email: spotifyUserProfile.email,
             password: '', // No password as it's an OAuth user
+            provider_id: provider.id,
             created_at: new Date(),
             updated_at: new Date(),
         };

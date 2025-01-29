@@ -27,6 +27,6 @@ export class OauthService {
                 created_at: new Date(), // replace with actual created_at
             },
         });
-    
+        return oauth_provider;
     }
 }
