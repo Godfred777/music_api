@@ -8,8 +8,8 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from './constants';
 import { AuthController } from './auth.controller';
-import { OauthService } from 'src/oauth/oauth.service';
 import { OauthModule } from 'src/oauth/oauth.module';
+import { SpotifyStrategy } from './spotify.strategy';
 
 @Module({
   imports: [
@@ -20,7 +20,7 @@ import { OauthModule } from 'src/oauth/oauth.module';
       signOptions: { expiresIn: '60s' },
     }),OauthModule
   ],
-  providers: [AuthService, LocalStrategy, JwtStrategy],
+  providers: [AuthService, LocalStrategy, JwtStrategy, SpotifyStrategy],
   exports: [AuthService],
   controllers: [AuthController],
 })

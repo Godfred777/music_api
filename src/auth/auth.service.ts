@@ -104,11 +104,11 @@ export class AuthService {
         return user;
     }
 
-    async getSpotifyAuthUrl(scopes: string[]): Promise<string> {
+    async getSpotifyAuthUrl(): Promise<string> {
         const params = new URLSearchParams({
             client_id: spotifyConfig.clientId,
             response_type: 'code',
-            scope: scopes.join(''),
+            scope: spotifyConfig.scopes.join(' '),
             redirect_uri: spotifyConfig.redirectUri,
             state: randomBytes(16).toString('hex'),
         });
@@ -217,5 +217,9 @@ export class AuthService {
         });
 
         return response.data;
+    }
+
+    updateUserTokens(id: number, accessToken: string, refreshToken: string): { id: number; first_name: string; last_name: string; email: string; password: string; provider_id: number | null; created_at: Date; updated_at: Date; } | PromiseLike<{ id: number; first_name: string; last_name: string; email: string; password: string; provider_id: number | null; created_at: Date; updated_at: Date; }> {
+        throw new Error('Method not implemented.');
     }
 }
