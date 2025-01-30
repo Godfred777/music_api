@@ -1,4 +1,4 @@
-import { Controller, Get, Query, Redirect } from '@nestjs/common';
+import { BadRequestException, Controller, Get, Query, Redirect } from '@nestjs/common';
 import { SpotifyAuthService } from './spotify-auth.service';
 
 @Controller('auth/spotify')
@@ -15,6 +15,10 @@ export class SpotifyAuthController {
   // Callback for Spotify OAuth2
   @Get('callback')
   async callback(@Query('code') code: string) {
+    if (!code) {
+        throw new BadRequestException('Authorization code needed')
+    }
+
     const tokens = await this.spotifyAuthService.getAccessToken(code);
     return { message: 'Successfully authenticated!', tokens };
   }
