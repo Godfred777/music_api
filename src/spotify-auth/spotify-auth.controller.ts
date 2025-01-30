@@ -1,25 +1,43 @@
-import { BadRequestException, Controller, Get, Query, Redirect } from '@nestjs/common';
+import { BadRequestException, Controller, Get, Query, Redirect, UnauthorizedException } from '@nestjs/common';
 import { SpotifyAuthService } from './spotify-auth.service';
+
+interface SpotifyCallbackQuery {
+  code: string;
+  state: string;
+  error?: string;
+}
 
 @Controller('auth/spotify')
 export class SpotifyAuthController {
   constructor(private readonly spotifyAuthService: SpotifyAuthService) {}
 
-  // Redirect to Spotify Authorization URL
   @Get('login')
   @Redirect()
   login() {
     return { url: this.spotifyAuthService.getAuthUrl() };
   }
 
-  // Callback for Spotify OAuth2
   @Get('callback')
-  async callback(@Query('code') code: string) {
-    if (!code) {
-        throw new BadRequestException('Authorization code needed')
+  async callback(@Query() query: SpotifyCallbackQuery) {
+    // Check for OAuth error
+    if (query.error) {
+      throw new UnauthorizedException(query.error);
     }
 
-    const tokens = await this.spotifyAuthService.getAccessToken(code);
-    return { message: 'Successfully authenticated!', tokens };
+    // Validate required parameters
+    if (!query.code || !query.state) {
+      throw new BadRequestException('Missing required parameters');
+    }
+
+    try {
+      const tokens = await this.spotifyAuthService.getAccessToken(query.code);
+      return { 
+        success: true,
+        message: 'Authentication successful'
+        // Don't expose tokens in response
+      };
+    } catch (error) {
+      throw new UnauthorizedException('Failed to authenticate with Spotify');
+    }
   }
 }
