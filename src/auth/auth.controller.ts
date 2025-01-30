@@ -4,8 +4,6 @@ import { LocalAuthGuard } from './local-auth.guard';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { LoginDto } from './dto/login-user.dto';
-import { Response } from 'express';
-import { SpotifyAuthGuard } from './spotify-auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -37,42 +35,4 @@ export class AuthController {
     async logout(@Request() req) {
         return this.authService.logout(req.user)
     }
-
-    //Redirects to Spotify login
-    @Get('spotify')
-    @UseGuards(SpotifyAuthGuard)
-    async spotifyLogin(@Res() res: Response) {
-        const authUrl = await this.authService.getSpotifyAuthUrl();
-        res.redirect(authUrl);
-    }
-
-
-    //Callback for Spotify login
-    @Post('spotify/callback')
-    @UseGuards(SpotifyAuthGuard)
-    async spotifyCallback(@Query('code') code: string, @Query('error') error: string, @Res() res: Response) {
-        try {
-            if (error) {
-                console.error('Spotify OAuth Error:', error);
-                return res.redirect('/login?error=spotify_auth_failed');
-            }
-
-            if (!code) {
-                return res.redirect('/login?error=no_auth_code');
-            }
-
-            const token = await this.authService.getSpotifyToken(code);
-            await this.authService.getSpotifyUserProfile(token.access_token);
-            await this.authService.create_or_update_OAuthProvider();
-            await this.authService.registerSpotifyUser(token);
-            const jwt = await this.authService.loginSpotifyUser(token);
-            
-            // Redirect with success
-            return res.redirect(`/auth/success?token=${jwt}`);
-        } catch (error) {
-            console.error('Spotify Callback Error:', error);
-            return res.redirect('/login?error=auth_failed');
-        }
-    }
-
 }

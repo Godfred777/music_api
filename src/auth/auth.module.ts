@@ -9,7 +9,8 @@ import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from './constants';
 import { AuthController } from './auth.controller';
 import { OauthModule } from 'src/oauth/oauth.module';
-import { SpotifyStrategy } from './spotify.strategy';
+import { SpotifyAuthService } from 'src/spotify-auth/spotify-auth.service';
+import { SpotifyAuthController } from 'src/spotify-auth/spotify-auth.controller';
 
 @Module({
   imports: [
@@ -20,8 +21,8 @@ import { SpotifyStrategy } from './spotify.strategy';
       signOptions: { expiresIn: '60s' },
     }),OauthModule
   ],
-  providers: [AuthService, LocalStrategy, JwtStrategy, SpotifyStrategy],
+  providers: [AuthService, LocalStrategy, JwtStrategy, SpotifyAuthService],
   exports: [AuthService],
-  controllers: [AuthController],
+  controllers: [AuthController, SpotifyAuthController],
 })
 export class AuthModule {}
