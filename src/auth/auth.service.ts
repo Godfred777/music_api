@@ -5,7 +5,6 @@ import * as bcrypt from 'bcrypt';
 import { Prisma } from '@prisma/client';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { LoginDto } from './dto/login-user.dto';
-import { OauthService } from 'src/oauth/oauth.service';
 
 interface JwtPayload {
   username: string;
@@ -31,7 +30,6 @@ export class AuthService {
     constructor(
         private usersService: UsersService,
         private jwtService: JwtService,
-        private oauthService: OauthService,
     ) {}
 
     async validateUser(email: string, password: string) {

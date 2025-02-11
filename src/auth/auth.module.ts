@@ -8,9 +8,7 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from './constants';
 import { AuthController } from './auth.controller';
-import { OauthModule } from 'src/oauth/oauth.module';
-import { SpotifyAuthService } from 'src/spotify-auth/spotify-auth.service';
-import { SpotifyAuthController } from 'src/spotify-auth/spotify-auth.controller';
+
 
 @Module({
   imports: [
@@ -18,11 +16,11 @@ import { SpotifyAuthController } from 'src/spotify-auth/spotify-auth.controller'
     PassportModule,
     JwtModule.register({
       secret: jwtConstants.secret,
-      signOptions: { expiresIn: '60s' },
-    }),OauthModule
+      signOptions: { expiresIn: '60m' },
+    }),
   ],
-  providers: [AuthService, LocalStrategy, JwtStrategy, SpotifyAuthService],
+  providers: [AuthService, LocalStrategy, JwtStrategy],
   exports: [AuthService],
-  controllers: [AuthController, SpotifyAuthController],
+  controllers: [AuthController],
 })
 export class AuthModule {}
