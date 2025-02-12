@@ -1,7 +1,7 @@
 import { Controller, Get, Query, Redirect } from '@nestjs/common';
 import { SpotifyAuthService } from './spotify.service';
 
-@Controller('spotify')
+@Controller('auth/spotify')
 export class SpotifyAuthController {
 
     constructor(private readonly spotifyAuthService: SpotifyAuthService) {}
